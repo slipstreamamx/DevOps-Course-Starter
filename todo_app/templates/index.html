@@ -5,6 +5,13 @@
   <div class="jumbotron">
     <h1 class="display-4">To-Do App</h1>
     <p class="lead">Just another to-do app.</p>
+    <form action="/addItem" method="POST">
+      <div class="form-group">
+        <label for="inputItem">Add Item</label>
+        <input name="inputItem" type="text" class="form-control" id="inputItem" placeholder="Title">
+      </div>
+      <button type="submit" class="btn btn-primary">Add</button>
+    </form>
   </div>
 
   <div class="row">
