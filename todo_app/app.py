@@ -1,6 +1,4 @@
-from flask import Flask, render_template
-from flask.globals import request
-from werkzeug.utils import redirect
+from flask import Flask, render_template, redirect,request
 from todo_app.data.session_items import *
 
 from todo_app.flask_config import Config
@@ -21,6 +19,22 @@ def addItem():
         return redirect('/')
     else:
         return redirect('/')
+
+@app.route('/complete', methods=['POST'])
+def completeItem():
+    c_id = request.form.get('btn-complete')
+    item = get_item(c_id)
+    item['status'] = 'Completed'
+    save_item(item)
+    return redirect('/')
+
+@app.route('/remove', methods=['POST'])
+def removeItem():
+    r_id = request.form.get('btn-remove')
+    item = get_item(r_id)
+    remove_item(item)
+    return redirect('/')
+
 
 if __name__ == '__main__':
     app.run()

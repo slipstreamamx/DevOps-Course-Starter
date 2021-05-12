@@ -20,7 +20,27 @@
       <ul class="list-group mb-4">
         <!-- List the todo items here -->
         {% for item in all_items %}
-        <li>{{item['title']}}</li>
+        <div class="container">
+          <div class="row">
+              <div class="col-sm-3">
+                <li class="m-2">
+                    {{ item['title'] }}
+                </li>
+              </div>
+            <div class="col-sm-1">
+                <form action="/remove" method="post">
+                  <button value="{{ item['id'] }}" name="btn-remove" type="submit" class="btn btn-danger btn-sm">Remove</button>
+                </form>
+              </div>
+              <div class="col">
+                {% if item['status'] != 'Completed' %}
+                    <form action="/complete" method="post">
+                      <button value="{{ item['id'] }}" name="btn-complete" type="submit" class="btn btn-success btn-sm">Complete</button>
+                    </form>
+                {% endif %}
+              </div>
+          </div>
+        </div>
         {% endfor %}
       </ul>
     </div>

@@ -1,3 +1,4 @@
+from typing import ItemsView
 from flask import session
 
 _DEFAULT_ITEMS = [
@@ -14,7 +15,9 @@ def get_items():
     Returns:
         list: The list of saved items.
     """
-    return session.get('items', _DEFAULT_ITEMS.copy())
+    items = session.get('items', _DEFAULT_ITEMS.copy())
+    sorted_items = sorted(items, key=lambda i: i['status'], reverse=True)
+    return sorted_items
 
 
 def get_item(id):
@@ -64,6 +67,22 @@ def save_item(item):
     """
     existing_items = get_items()
     updated_items = [item if item['id'] == existing_item['id'] else existing_item for existing_item in existing_items]
+
+    session['items'] = updated_items
+
+    return item
+
+def remove_item(item):
+    """
+    removes existing item in session. if no existing item matches the ID of the specified item.
+
+    args:
+        item: the item to remove.
+    """
+
+    existing_items = get_items()
+    existing_items.remove(item)
+    updated_items = existing_items
 
     session['items'] = updated_items
 
