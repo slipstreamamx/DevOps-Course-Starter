@@ -1,39 +1,44 @@
-from flask import Flask, render_template, redirect,request
-from todo_app.data.session_items import *
-
+from flask import Flask, render_template, redirect, url_for, request
 from todo_app.flask_config import Config
+from todo_app.data import trello_items as trello
+
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
 
+
 @app.route('/')
 def index():
-    return render_template('index.html', all_items=get_items())
+    items = trello.get_items()
+    return render_template('index.html', items = items)
 
-@app.route('/addItem', methods=['GET', 'POST'])
-def addItem():
-    if request.method == 'POST':
-        title = request.form.get('inputItem')
-        add_item(title)
-        return redirect('/')
-    else:
-        return redirect('/')
 
-@app.route('/complete', methods=['POST'])
-def completeItem():
-    c_id = request.form.get('btn-complete')
-    item = get_item(c_id)
-    item['status'] = 'Completed'
-    save_item(item)
-    return redirect('/')
+@app.route('/items/new', methods=['POST'])
+def add_item():
+    name = request.form['name']
+    desc = request.form['desc']
+    due = request.form['due']
+    trello.add_item(name, desc, due)
+    return redirect(url_for('index'))
 
-@app.route('/remove', methods=['POST'])
-def removeItem():
-    r_id = request.form.get('btn-remove')
-    item = get_item(r_id)
-    remove_item(item)
-    return redirect('/')
+
+@app.route('/items/<id>/complete')
+def complete_item(id):
+    trello.complete_item(id)
+    return redirect(url_for('index'))
+
+
+@app.route('/items/<id>/start')
+def start_item(id):
+    trello.start_item(id)
+    return redirect(url_for('index'))
+
+
+@app.route('/items/<id>/uncomplete')
+def uncomplete_item(id):
+    trello.uncomplete_item(id)
+    return redirect(url_for('index'))
 
 
 if __name__ == '__main__':

@@ -1,46 +1,62 @@
 {% extends "layout.html" %}
 {% block title %}To-Do App{% endblock %}
 
+{% macro display_item(item) -%}
+  <li class="list-group-item flex-column">
+    <div class="d-flex w-100 justify-content-between">
+      <h5 class="mt-1 mb-1">{{ item.name }}</h5>
+      {% if item.status == 'Done' %}
+        {% set badge_class = 'badge-success' %}
+      {% elif item.status == 'To Do' %}
+        {% set badge_class = 'badge-secondary' %}
+      {% else %}
+        {% set badge_class = 'badge-primary' %}
+      {% endif %}
+      <div> <span class="badge {{ badge_class }}"> {{item.status}} </span> </div>
+    </div>
+      <div>
+        {% if item.status == 'Done' %}
+          <a href="{{ url_for('uncomplete_item', id=item.id) }}" class="btn btn-sm btn-secondary">Mark as Incomplete</a>
+        {% elif item.status == 'To Do' %}
+          <a href="{{ url_for('start_item', id=item.id) }}" class="btn btn-sm btn-success">Start</a>
+        {% else %}
+          <a href="{{ url_for('complete_item', id=item.id) }}" class="btn btn-sm btn-primary">Mark as Completed</a>
+        {% endif %}
+      </div>
+  </li>
+{%- endmacro %}
+
+
 {% block content %}
   <div class="jumbotron">
     <h1 class="display-4">To-Do App</h1>
     <p class="lead">Just another to-do app.</p>
-    <form action="/addItem" method="POST">
-      <div class="form-group">
-        <label for="inputItem">Add Item</label>
-        <input name="inputItem" type="text" class="form-control" id="inputItem" placeholder="Title">
-      </div>
-      <button type="submit" class="btn btn-primary">Add</button>
-    </form>
+  </div>
+
+  <div class="row">
+    <div class="col-md-12">
+      <h2>New item</h2>
+      <form action="{{ url_for('add_item') }}" method="POST">
+        <div class="form-group form-row align-items-center">
+          <div class="col">
+            <input type="text" placeholder="Name" name="name" id="title-input" class="form-control">
+            <input type="text" placeholder="Description" name="desc" id="description-input" class="form-control">
+            <input type="date" placeholder="Due Date" name="due" id="due-input" class="form-control">
+          </div>
+          <div class="col-auto">
+            <button type="submit" class="btn btn-success">Add Item</button>
+          </div>
+        </div>
+      </form>
+    </div>
   </div>
 
   <div class="row">
     <div class="col-md-12">
       <h2>Items</h2>
       <ul class="list-group mb-4">
-        <!-- List the todo items here -->
-        {% for item in all_items %}
-        <div class="container">
-          <div class="row">
-              <div class="col-sm-3">
-                <li class="m-2">
-                    {{ item['title'] }}
-                </li>
-              </div>
-            <div class="col-sm-1">
-                <form action="/remove" method="post">
-                  <button value="{{ item['id'] }}" name="btn-remove" type="submit" class="btn btn-danger btn-sm">Remove</button>
-                </form>
-              </div>
-              <div class="col">
-                {% if item['status'] != 'Completed' %}
-                    <form action="/complete" method="post">
-                      <button value="{{ item['id'] }}" name="btn-complete" type="submit" class="btn btn-success btn-sm">Complete</button>
-                    </form>
-                {% endif %}
-              </div>
-          </div>
-        </div>
+        {% for item in items %}
+          {{ display_item(item) }}
         {% endfor %}
       </ul>
     </div>
